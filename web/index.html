@@ -1,0 +1,32 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GUI</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div>
+        <label for="ipaddress">ターゲットIPアドレス</label>
+        <input type="text" id="ipaddress">
+
+        <button onclick="start_fade()">開始</button>
+    </div>
+
+    <div class="tl_container">
+        <div class="tl_block" id="initial_block">
+            <div class="tl_block_interval">
+                <label>フェード時間<input type="number" class="duration" value="10" min="0"></label>sec</label><br>
+            </div>
+            <div class="tl_block_status">
+                <label>強度<input type="number" class="intensity" value="50" min="0" step="1" max="100"></label>%</label>
+                <label>色温度<input type="number" class="temperature" value="4800" min="2900" step="10" max="10000"></label>K</label>
+            </div>
+        </div>
+    </div>
+    <button onclick="add_timeline_block()">追加+</button>
+    <button onclick="remove_timeline_block()">削除-</button>
+
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

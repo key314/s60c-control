@@ -1,0 +1,7 @@
+.tl_block_status {
+    background-color: #BBB;
+}
+
+div#initial_block > .tl_block_interval {
+    display: none;
+}
