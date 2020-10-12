@@ -19,8 +19,8 @@ class LinearFadeMultiCore:
     def __init__(self, target : list):
         width = len(target)
 
-        self.__val_start : int = 0
-        self.__val_target : int = 0
+        self.__val_start : float = 0
+        self.__val_target : float = 0
         self.__val_current : float = 0.0
         self.__factor : float = 1.0
         self.__flag = [False] * width
@@ -51,6 +51,9 @@ class LinearFadeMultiCore:
             self.__flag[pos] = True
 
         return int(self.__val_current) >> ((len(self.__fades) - pos - 1) * 8) & 0xff
+
+    def get_progress(self):
+        return (self.__val_current - self.__val_start) / (self.__val_target - self.__val_start)
 
     def is_done(self):
         curr = round(self.__val_current)

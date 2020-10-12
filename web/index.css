@@ -1,7 +1,112 @@
-.tl_block_status {
-    background-color: #BBB;
+body {
+    --color-background: #e8eff5;
+    background-color: var(--color-background);
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
 }
 
-div#initial_block > .tl_block_interval {
+.tl_container {
+    display: block;
+    margin: 20px 0 20px 0;
+}
+
+.tl_block {
+    display: flex;
+}
+
+.tl_block_interval {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.tl_block_status {
+    --color-status: #ffffff;
+    margin-right: 20px;
+    background-color: var(--color-status);
+    filter: drop-shadow(2px 2px 1.5px #ccd8e2);
+}
+
+.tl_block_status > label {
+    display: inline-flex;
+    align-items: center;
+    margin: 10px;
+}
+
+.tl_block_status::after {
+    content: '';
+    position: absolute;
+    --triangle-bottom: 5px;
+    border-top: var(--triangle-bottom) solid transparent;
+    border-right: var(--triangle-bottom) solid transparent;
+    border-bottom: var(--triangle-bottom) solid transparent;
+    border-left: var(--triangle-bottom) solid var(--color-status);
+    bottom: 15px;
+}
+
+.progressbar_bg {
+    --color-progress-incomplete: #808080;
+    --color-progress-complete: #ffa500;
+    background-color: var(--color-progress-incomplete);
+    border-color: var(--color-progress-incomplete);
+}
+
+.complete {
+    background-color: var(--color-progress-complete);
+    border-color: var(--color-progress-complete);
+}
+
+.progressbar_bg {
+    position: relative;
+    bottom: 16px;
+    width: 5px;
+    border-radius: 5px;
+    border-width: 0px;
+}
+
+.progressbar {
+    border-radius: inherit;
+}
+
+.progressbar_bg::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    padding-top: 14px;
+    border-radius: 50%;
+    bottom: -7px;
+    left: -7px;
+    z-index: 1;
+    border-width: 3px;
+    border-style: solid;
+    border-color: inherit;
+    background-color: var(--color-background);
+}
+
+.progressbar_bg.complete::before {
+    background-color: var(--color-progress-complete);
+}
+
+.progressbar_bg::after {
+    content: '';
+    position: absolute;
+    transform: rotate(45deg);
+    width: 5px;
+    height: 9px;
+    bottom: -1.3px;
+    left: -1px;
+    z-index: 2;
+    border-bottom: 2px;
+    border-right: 2px;
+    border-style: none solid solid none;
+    border-color: var(--color-background);
+}
+
+div#initial_block .tl_block_interval {
     display: none;
+}
+
+div#initial_block .progressbar_bg {
+    margin-top: auto;
 }

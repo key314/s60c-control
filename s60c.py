@@ -17,23 +17,28 @@ class S60C:
     def add_fade(self, intensity, temperature, duration_ms):
         self.queue.put_nowait(
             [
-                LinearFadeMultiCore(S60C.perc2byte(intensity/100)).get_fades(),
-                LinearFadeMultiCore(S60C.temp2byte(temperature)).get_fades(),
+                LinearFadeMultiCore(S60C.perc2byte(intensity/100)),
+                LinearFadeMultiCore(S60C.temp2byte(temperature)),
                 duration_ms
             ]
         )
 
-    def start_fade(self):
-        async def fetch(q):
-            while not q.empty():
-                f = await q.get()
-                self.intensity_channel.add_fade(f[0], f[2])
-                self.temperature_channel.add_fade(f[1], f[2])
+    def start_fade(self, change_callback, fade_finished_callback):
+        async def fetch():
+            i = 0
+            while not self.queue.empty():
+                q = await self.queue.get()
+                self.intensity_channel.add_fade(q[0].get_fades(), q[2])
+                self.intensity_channel.callback_value_changed = \
+                    lambda: change_callback(q[0].get_progress() * 100)
+                self.temperature_channel.add_fade(q[1].get_fades(), q[2])
                 await self.intensity_channel.wait_till_fade_complete()
+                await self.temperature_channel.wait_till_fade_complete()
+                fade_finished_callback(i)
+                i += 1
             await self.node.stop()
         
-        asyncio.get_event_loop().run_until_complete(fetch(self.queue))
-        print("FIN")
+        asyncio.get_event_loop().run_until_complete(fetch())
 
     def terminate(self):
         self.node = None
@@ -46,8 +51,5 @@ class S60C:
     def perc2byte(percentage):
         return int(percentage * 65535).to_bytes(2, 'big')
 
-    def byte2temp(tempbytes):
-        return float(int.from_bytes(tempbytes)) / 65535 * TEMP_WIDTH + TEMP_LOWER
-
-    def byte2perc(percbytes):
-        return float(int.from_bytes(percbytes)) / 655.35
+    def prog2temp(progress):
+        return (progress * TEMP_WIDTH) + TEMP_LOWER

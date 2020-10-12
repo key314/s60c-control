@@ -1,17 +1,21 @@
 import eel
-from s60c import S60C
+import s60c
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
+import argparse
+argparser = argparse.ArgumentParser()
+argparser.add_argument('-D', '--debug', action='store_true')
+if True:# argparser.parse_args().debug:
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
 
 @eel.expose
 def start_fade(ipaddr, fades):
-    node = S60C(ipaddr)
+    node = s60c.S60C(ipaddr)
     # fades : [{duration:(ms), intensity:(percentage), temperature(K)}, ...]
     for d in fades:
         node.add_fade(d["intensity"], d["temperature"], d["duration"])
-    
-    node.start_fade()
+
+    node.start_fade(eel.progress_callback, eel.finish_callback)
 
 eel.init('web')
 eel.start('index.html', port=8080)
