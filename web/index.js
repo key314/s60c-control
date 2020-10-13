@@ -71,7 +71,7 @@ function finish_callback(task_id) {
         current_progressbar = bl_array[task_id + 1].getElementsByClassName("progressbar")[0];
         current_progressbar.classList.add("complete");
     } else {
-        document.getElementsByClassName("button_start")[0].disabled = false;
+        stop_fade();
     }
 };
 
@@ -80,4 +80,13 @@ const start_fade = () => {
     reset_progressbars();
     eel.start_fade(get_ipaddr(), get_fade_info());
     document.getElementsByClassName("button_start")[0].disabled = true;
+    document.getElementsByClassName("button_stop")[0].disabled = false;
 };
+
+const stop_fade = () => {
+    eel.stop_fade();
+    document.getElementsByClassName("button_start")[0].disabled = false;
+    document.getElementsByClassName("button_stop")[0].disabled = true;
+};
+
+window.onunload = stop_fade;

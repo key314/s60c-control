@@ -13,6 +13,7 @@ class S60C:
         self.intensity_channel = univ.add_channel(1, 2)
         self.temperature_channel = univ.add_channel(3, 2)
         self.queue = asyncio.Queue()
+        self.__is_running = False
 
     def add_fade(self, intensity, temperature, duration_ms):
         self.queue.put_nowait(
@@ -23,26 +24,34 @@ class S60C:
             ]
         )
 
-    def start_fade(self, change_callback, fade_finished_callback):
+    def start_fade(self, progress_callback, fade_finished_callback):
         async def fetch():
             i = 0
             while not self.queue.empty():
                 q = await self.queue.get()
                 self.intensity_channel.add_fade(q[0].get_fades(), q[2])
-                self.intensity_channel.callback_value_changed = \
-                    lambda: change_callback(q[0].get_progress() * 100)
                 self.temperature_channel.add_fade(q[1].get_fades(), q[2])
+                for j in range(100):
+                    if not self.__is_running:
+                        break
+                    progress_callback(j)
+                    await asyncio.sleep(q[2] / 100000)
                 await self.intensity_channel.wait_till_fade_complete()
                 await self.temperature_channel.wait_till_fade_complete()
                 fade_finished_callback(i)
                 i += 1
             await self.node.stop()
+            self.__is_running = False
         
+        self.__is_running = True
         asyncio.get_event_loop().run_until_complete(fetch())
 
-    def terminate(self):
-        self.node = None
-        self.univ = None
+    def stop_fade(self):
+        while not self.queue.empty():
+            self.queue.get_nowait()
+        self.intensity_channel.cancel_fades()
+        self.temperature_channel.cancel_fades()
+        self.__is_running = False
 
     def temp2byte(temprature):
         p = (temprature - TEMP_LOWER) / TEMP_WIDTH
