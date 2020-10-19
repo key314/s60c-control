@@ -8,17 +8,17 @@
 <body>
     <div>
         <label for="ipaddress">ターゲットIPアドレス</label>
-        <input type="text" id="ipaddress">
+        <input type="text" id="ipaddress" pattern="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" placeholder="127.0.0.1" maxlength="15" size="15">
 
         <button class="button_start" onclick="start_fade()">開始</button>
-        <button class="button_stop" onclick="stop_fade()" disabled hidden>中断</button>
+        <button class="button_stop" onclick="stop_fade()" disabled>中断</button>
     </div>
 
     <div class="tl_container">
         <div class="tl_block" id="initial_block">
             <div>
                 <div class="tl_block_interval">
-                    <label>フェード時間<input type="number" class="duration" value="10" min="0" max="32767">sec</label><label></label>
+                    <label>フェード時間<input type="number" class="duration" value="3" min="0" max="32767">sec</label><label></label>
                 </div>
                 <div class="tl_block_status">
                     <label>強度<input type="number" class="intensity" value="50" min="0" step="1" max="100">%</label>
@@ -30,7 +30,7 @@
             </div>
         </div>
     </div>
-    <button onclick="add_timeline_block()">追加+</button>
+    <button class="button_add" onclick="add_timeline_block()">追加+</button>
     <button class="button_remove" onclick="remove_timeline_block()" disabled>削除-</button>
 
     <script type="text/javascript" src="/eel.js"></script>

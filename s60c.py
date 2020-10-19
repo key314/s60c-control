@@ -1,6 +1,8 @@
+import async_eel
 from pyartnet import ArtNetNode
 from LinearFadeMulti import LinearFadeMultiCore
 import asyncio
+import time
 
 TEMP_LOWER = 2800.0
 TEMP_WIDTH = 10000.0 - TEMP_LOWER
@@ -25,26 +27,37 @@ class S60C:
         )
 
     def start_fade(self, progress_callback, fade_finished_callback):
+        async def count_progress(wait_sec):
+            end_time = time.time() + wait_sec
+            interval = wait_sec / 100
+            if interval < 0.1:
+                interval = 0.1
+            while self.__is_running:
+                remain = end_time - time.time()
+                progress_callback(100 - (remain / wait_sec * 100))
+                if remain < interval:
+                    return True
+                await asyncio.sleep(interval)
+            return False
+
         async def fetch():
-            i = 0
+            task_id = 0
             while not self.queue.empty():
                 q = await self.queue.get()
                 self.intensity_channel.add_fade(q[0].get_fades(), q[2])
                 self.temperature_channel.add_fade(q[1].get_fades(), q[2])
-                for j in range(100):
-                    if not self.__is_running:
-                        break
-                    progress_callback(j)
-                    await asyncio.sleep(q[2] / 100000)
+                is_finished = await count_progress(q[2] / 1000)
                 await self.intensity_channel.wait_till_fade_complete()
                 await self.temperature_channel.wait_till_fade_complete()
-                fade_finished_callback(i)
-                i += 1
+                if is_finished:
+                    fade_finished_callback(task_id)
+                task_id += 1
             await self.node.stop()
             self.__is_running = False
         
         self.__is_running = True
-        asyncio.get_event_loop().run_until_complete(fetch())
+        asyncio.run_coroutine_threadsafe(fetch(), asyncio.get_event_loop())
+        #asyncio.get_event_loop().run_until_complete(fetch())
 
     def stop_fade(self):
         while not self.queue.empty():

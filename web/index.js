@@ -10,6 +10,7 @@ const add_timeline_block = () => {
     const blocks = get_tl_block_array();
     const nextnode = blocks.slice(-1)[0].cloneNode(true);
     nextnode.id = ID_PREFIX + blocks.length;
+    reset_complete(nextnode);
     tl_container.append(nextnode);
     document.getElementsByClassName("button_remove")[0].disabled = false;
 };
@@ -35,8 +36,10 @@ const get_fade_info = () => {
     return fades;
 };
 
-const reset_progressbars = () => {
-    [].slice.call(tl_container.getElementsByClassName("complete")).forEach(node => {
+const reset_progressbars = () => reset_complete(tl_container);
+
+const reset_complete = (parent_node) => {
+    [].slice.call(parent_node.getElementsByClassName("complete")).forEach(node => {
         node.classList.remove("complete");
         if (node.classList.contains("progressbar")) {
             node.style.height = "0%";
@@ -45,7 +48,11 @@ const reset_progressbars = () => {
 };
 
 const get_ipaddr = () => {
-    return document.getElementById("ipaddress").value;
+    ip = document.getElementById("ipaddress").value;
+    if (!ip) {
+        ip = "127.0.0.1";
+    }
+    return ip;
 };
 
 eel.expose(current_value_callback);
@@ -78,15 +85,21 @@ function finish_callback(task_id) {
 
 const start_fade = () => {
     reset_progressbars();
-    eel.start_fade(get_ipaddr(), get_fade_info());
+    eel.start_fade(get_ipaddr(), get_fade_info())();
     document.getElementsByClassName("button_start")[0].disabled = true;
     document.getElementsByClassName("button_stop")[0].disabled = false;
+    document.getElementsByClassName("button_add")[0].disabled = true;
+    document.getElementsByClassName("button_remove")[0].disabled = true;
 };
 
 const stop_fade = () => {
     eel.stop_fade();
     document.getElementsByClassName("button_start")[0].disabled = false;
     document.getElementsByClassName("button_stop")[0].disabled = true;
+    document.getElementsByClassName("button_add")[0].disabled = false;
+    if (get_tl_block_array().length > 1) {
+        document.getElementsByClassName("button_remove")[0].disabled = false;
+    };
 };
 
 window.onunload = stop_fade;

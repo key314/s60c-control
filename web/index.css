@@ -1,6 +1,14 @@
 body {
-    --color-background: #e8eff5;
+    --color-background: #d1d1e9;
+    --color-text: #2b2c34;
+    --color-button: #6246ea;
+    --color-status: #fffffe;
+    --color-status-shadow: #b1b1c5;
+    --color-progress-incomplete: #fffffe;
+    --color-progress-complete: #e45858;
+
     background-color: var(--color-background);
+    color: var(--color-text);
     font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
 }
 
@@ -22,10 +30,9 @@ body {
 }
 
 .tl_block_status {
-    --color-status: #ffffff;
     margin-right: 20px;
     background-color: var(--color-status);
-    filter: drop-shadow(2px 2px 1.5px #ccd8e2);
+    filter: drop-shadow(2px 2px 1.5px var(--color-status-shadow));
 }
 
 .tl_block_status > label {
@@ -46,8 +53,6 @@ body {
 }
 
 .progressbar_bg {
-    --color-progress-incomplete: #808080;
-    --color-progress-complete: #ffa500;
     background-color: var(--color-progress-incomplete);
     border-color: var(--color-progress-incomplete);
 }
